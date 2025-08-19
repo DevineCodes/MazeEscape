@@ -22,6 +22,25 @@
 	const FLOOR_ALT_COLOR = '#121623';
 	const OVERLAY_DARK = 'rgba(0,0,0,0.65)';
 
+	// Deterministic maze seed (keeps the maze static across runs)
+	const MAZE_SEED = 133742069;
+	function mulberry32(seed) {
+		let t = seed >>> 0;
+		return function() {
+			t += 0x6D2B79F5;
+			let x = Math.imul(t ^ t >>> 15, 1 | t);
+			x ^= x + Math.imul(x ^ x >>> 7, 61 | x);
+			return ((x ^ x >>> 14) >>> 0) / 4294967296;
+		};
+	}
+	function seededShuffle(arr, rng) {
+		for (let i = arr.length - 1; i > 0; i--) {
+			const j = Math.floor(rng() * (i + 1));
+			[arr[i], arr[j]] = [arr[j], arr[i]];
+		}
+		return arr;
+	}
+
 	// Geometry
 	let view = {
 		cx: 0,
@@ -114,6 +133,7 @@
 	}
 
 	function generateMaze(grid) {
+		const rng = mulberry32(MAZE_SEED);
 		// Randomized DFS (Recursive Backtracker)
 		const visited = new Set();
 		const stack = [];
@@ -122,11 +142,7 @@
 		visited.add(`${start.q},${start.r}`);
 
 		function randShuffle(arr){
-			for (let i = arr.length - 1; i > 0; i--) {
-				const j = Math.floor(Math.random() * (i + 1));
-				[arr[i], arr[j]] = [arr[j], arr[i]];
-			}
-			return arr;
+			return seededShuffle(arr, rng);
 		}
 
 		while (stack.length) {
@@ -150,8 +166,8 @@
 					const e = grid.getEdge(q, r, n.q, n.r);
 					return !e; // no edge yet
 				});
-				if (options.length > 0 && Math.random() < 0.15) {
-					const pick = options[Math.floor(Math.random() * options.length)];
+				if (options.length > 0 && rng() < 0.15) {
+					const pick = options[Math.floor(rng() * options.length)];
 					grid.setEdgeOpen(q, r, pick.q, pick.r, true);
 				}
 			}
@@ -170,10 +186,7 @@
 			}
 		}
 		// Shuffle and pick a fraction as doors
-		for (let i = possibleDoors.length - 1; i > 0; i--) {
-			const j = Math.floor(Math.random() * (i + 1));
-			[possibleDoors[i], possibleDoors[j]] = [possibleDoors[j], possibleDoors[i]];
-		}
+		seededShuffle(possibleDoors, rng);
 		const doorCount = Math.floor(possibleDoors.length * 0.18);
 		for (let i = 0; i < doorCount; i++) {
 			const d = possibleDoors[i];
@@ -431,16 +444,6 @@
 		}
 
 		// Draw walls and doors
-		for (let r = 0; r < grid.height; r++) {
-			for (let q = 0; q < grid.width; q++) {
-				const neigh = grid.neighbors(q, r);
-				for (const n of neigh) {
-					// only draw each shared edge once by ordering
-					if (edgeKey(q, r, n.q, n.r) !== edgeKey(q, r, n.q, n.r)) continue;
-				}
-			}
-		}
-		// Iterate all edges instead to avoid duplicates
 		for (const [k, e] of grid.edges.entries()) {
 			// parse edge
 			const [a, b] = k.split('|');
