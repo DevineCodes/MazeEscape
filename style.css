@@ -1,0 +1,10 @@
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: #0f0f13; color: #e8e8f0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+#game { display: block; width: 100vw; height: 100vh; }
+#hud { position: fixed; top: 12px; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; pointer-events: none; }
+#hud .left, #hud .center, #hud .right { pointer-events: auto; }
+#timer { font-weight: 700; font-variant-numeric: tabular-nums; background: #15161d; padding: 6px 10px; border-radius: 8px; border: 1px solid #2a2d3a; }
+#status { background: rgba(20, 130, 255, 0.12); border: 1px solid rgba(20, 130, 255, 0.35); padding: 6px 10px; border-radius: 8px; min-width: 220px; display: inline-block; text-align: center; }
+#restart { background: #1e2230; color: #e8e8f0; border: 1px solid #2a2d3a; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
+#restart:hover { background: #2a2f40; }
+#help { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); font-size: 12px; color: #b7c1d6; opacity: 0.9; background: rgba(16,16,24,0.7); border: 1px solid #2a2d3a; padding: 6px 10px; border-radius: 8px; display: flex; gap: 12px; }
