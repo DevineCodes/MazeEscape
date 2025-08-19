@@ -210,17 +210,21 @@
 		const padding = 32;
 		const usableW = w - padding * 2;
 		const usableH = h - padding * 2;
-		// pointy-top: width per column = sqrt(3)*r, height per row = 1.5*r
-		const radiusByWidth = usableW / (Math.sqrt(3) * (GRID_WIDTH - 1 + (GRID_HEIGHT - 1)/2) + 1.75);
-		const radiusByHeight = usableH / (1.5 * (GRID_HEIGHT - 1) + 2.5);
+		// Compute radius to fit entire grid bounding box without jitter
+		// Grid extents (centers) without origin: widthCenters = sqrt(3)*R*(W-1 + (H-1)/2), heightCenters = 1.5*R*(H-1)
+		// Total extents including hex radius margins: add 2R in both axes
+		const denomW = Math.sqrt(3) * (GRID_WIDTH - 1 + (GRID_HEIGHT - 1) / 2) + 2;
+		const denomH = 1.5 * (GRID_HEIGHT - 1) + 2;
+		const radiusByWidth = usableW / denomW;
+		const radiusByHeight = usableH / denomH;
 		view.radius = Math.max(14, Math.min(radiusByWidth, radiusByHeight));
 		view.hexW = Math.sqrt(3) * view.radius;
 		view.hexH = 2 * view.radius;
-		// Center grid
-		const topLeft = axialToPixel(0, 0);
-		const bottomRight = axialToPixel(GRID_WIDTH - 1, GRID_HEIGHT - 1);
-		view.originX = padding + (w - padding*2 - (bottomRight.x - topLeft.x)) / 2 - topLeft.x + view.radius * 0.5;
-		view.originY = padding + (h - padding*2 - (bottomRight.y - topLeft.y)) / 2 - topLeft.y + view.radius * 0.5;
+		// Center grid: set origin so that left/top margins are equal
+		const gridWidthPx = Math.sqrt(3) * view.radius * (GRID_WIDTH - 1 + (GRID_HEIGHT - 1) / 2) + 2 * view.radius;
+		const gridHeightPx = 1.5 * view.radius * (GRID_HEIGHT - 1) + 2 * view.radius;
+		view.originX = padding + (usableW - gridWidthPx) / 2 + view.radius;
+		view.originY = padding + (usableH - gridHeightPx) / 2 + view.radius;
 	}
 
 	function drawHex(x, y, radius, fill, stroke, strokeWidth = 2) {
@@ -518,7 +522,7 @@
 		const dt = Math.min(100, ts - lastTs);
 		lastTs = ts;
 		update(dt);
-		computeView();
+		// computeView(); // no longer recalculated every frame to avoid jitter
 		render();
 		timerEl.textContent = formatTime(countdownMs);
 		requestAnimationFrame(frame);
