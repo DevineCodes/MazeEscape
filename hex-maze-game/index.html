@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Hex Maze Escape</title>
+	<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+	<canvas id="game"></canvas>
+	<div id="hud">
+		<div class="left">
+			<span id="timer">01:00</span>
+		</div>
+		<div class="center">
+			<span id="status"></span>
+		</div>
+		<div class="right">
+			<button id="restart" title="Restart (R)">Restart</button>
+		</div>
+	</div>
+	<div id="help">
+		<div><strong>Move</strong>: Q W E A S D</div>
+		<div><strong>Open Door</strong>: Space (when adjacent)</div>
+		<div><strong>Goal</strong>: Reach the home (flag) before time runs out. Avoid ghosts!</div>
+	</div>
+	<script src="./game.js"></script>
+</body>
+</html>
